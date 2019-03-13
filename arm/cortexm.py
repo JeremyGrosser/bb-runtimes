@@ -269,6 +269,60 @@ class Sam(ArmV7MTarget):
                 'src/s-bbpara__sam4s.ads'])
 
 
+class SamD(ArmV6MTarget):
+    @property
+    def name(self):
+        return 'samd21'
+
+    @property
+    def use_semihosting_io(self):
+        return False
+
+    @property
+    def has_fpu(self):
+        return False
+
+    @property
+    def compiler_switches(self):
+        # The required compiler switches
+        return ('-mlittle-endian', '-mthumb', '-msoft-float',
+                '-mcpu=cortex-m0plus')
+
+    @property
+    def system_ads(self):
+        return {'zfp': 'system-xi-arm.ads',
+                'ravenscar-sfp': 'system-xi-armv6m-sfp.ads'}
+
+    def __init__(self):
+        super(SamD, self).__init__()
+
+        self.add_linker_script('arm/samd/common-ROM.ld', loader=None)
+        self.add_linker_script('arm/samd/samd21/memory-map.ld', loader=None)
+
+        self.add_sources('crt0', [
+            'src/s-bbarat.ads',
+            'src/s-bbarat.adb',
+            'src/s-textio__samd21.adb',
+            'arm/samd/start-rom.S',
+            'arm/samd/samd21/svd/i-samd.ads',
+            'arm/samd/samd21/svd/i-samd-pm.ads',
+            'arm/samd/samd21/svd/i-samd-gclk.ads',
+            'arm/samd/samd21/svd/i-samd-rtc.ads',
+            'arm/samd/samd21/svd/i-samd-sysctrl.ads',
+            'arm/samd/samd21/svd/i-samd-sercom.ads',
+            'arm/samd/samd21/svd/i-samd-port.ads',
+            'arm/samd/samd21/s-bbbopa.ads',
+            'arm/samd/samd21/s-bbmcpa.ads'])
+
+        self.add_sources('gnarl', [
+            'arm/samd/samd21/board_config.ads',
+            'arm/samd/samd21/svd/handler.S',
+            'arm/samd/samd21/svd/a-intnam.ads',
+            'src/s-bbpara__samd21.ads',
+            'src/s-bbbosu__armv7m.adb',
+            'src/s-bcpcst__pendsv.adb'])
+
+
 class SmartFusion2(ArmV7MTarget):
     @property
     def name(self):
