@@ -16,7 +16,7 @@ from pikeos import ArmPikeOS, ArmPikeOS42
 
 # Cortex-M runtimes
 from arm.cortexm import Stm32, Sam, SmartFusion2, LM3S, Microbit, \
-     NRF52840, NRF52832, MicrosemiM1, \
+     NRF52840, NRF52832, MicrosemiM1, Stm32F0, Pico, \
      CortexM0, CortexM0P, CortexM1, CortexM3, CortexM4, CortexM4F, \
      CortexM7F, CortexM7DF
 
@@ -70,6 +70,8 @@ def build_configs(target):
         t = Rpi2()
     elif target == 'rpi2mc':
         t = Rpi2Mc()
+    elif target == 'pico':
+        t = Pico()
     elif target.startswith('sam'):
         t = Sam(target)
     elif target.startswith('smartfusion2'):

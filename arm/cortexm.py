@@ -743,6 +743,53 @@ class CortexM0P(CortexM0):
                 '-mcpu=cortex-m0plus')
 
 
+class RP2040(CortexM0P):
+    @property
+    def name(self):
+        return 'rp2040'
+
+    @property
+    def loaders(self):
+        return ('ROM', )
+
+    @property
+    def system_ads(self):
+        return {'zfp': 'system-xi-arm.ads',
+                'ravenscar-sfp': 'system-xi-armv6m-sfp.ads',
+                'ravenscar-full': 'system-xi-armv6m-full.ads'}
+
+    def __init__(self):
+        super(RP2040, self).__init__()
+
+        self.add_linker_script('arm/raspberrypi/rp2040/memmap_default.ld', loader='ROM')
+
+        self.add_gnat_sources(
+            'arm/raspberrypi/rp2040/svd/i-rp2040.ads',
+            'arm/raspberrypi/rp2040/svd/i-rp2040-resets.ads',
+            'arm/raspberrypi/rp2040/svd/handler.S',
+            'arm/raspberrypi/rp2040/boot2.S',
+            'arm/raspberrypi/rp2040/crt0.S',
+            'arm/raspberrypi/rp2040/s-bbmcpa.ads')
+
+        self.add_gnarl_sources(
+            'arm/raspberrypi/rp2040/svd/a-intnam.ads',
+            'src/s-bbpara__rp2040.ads',
+            'src/s-bbbosu__armv6m.adb',
+            'src/s-bcpcst__pendsv.adb')
+
+
+class Pico(RP2040):
+    @property
+    def name(self):
+        return 'pico'
+
+    def __init__(self):
+        super(Pico, self).__init__()
+
+        self.add_gnat_sources(
+            'arm/raspberrypi/rp2040/s-bbbopa__pico.ads')
+
+
 class CortexM1(ArmV6MTarget):
     @property
     def name(self):
