@@ -36,7 +36,7 @@
 
 .global __vectors
 __vectors:
-.word __StackTop
+.word __stack_end
 .word _reset_handler
 .word isr_nmi
 .word isr_hardfault
@@ -47,11 +47,11 @@ __vectors:
 .word isr_invalid
 .word isr_invalid
 .word isr_invalid
-.word isr_svcall
+.word __gnat_sv_call_trap
+.word __gnat_bkpt_trap
 .word isr_invalid
-.word isr_invalid
-.word isr_pendsv
-.word isr_systick
+.word __gnat_pend_sv_trap
+.word __gnat_sys_tick_trap
 .word isr_irq0
 .word isr_irq1
 .word isr_irq2
@@ -86,6 +86,33 @@ __vectors:
 .word isr_irq31
 
 
+.thumb_func
+.weak __gnat_irq_trap
+.type __gnat_irq_trap, %function
+__gnat_irq_trap:
+0: b 0b
+.size __gnat_irq_trap, . - __gnat_irq_trap
+
+.thumb_func
+.weak __gnat_sv_call_trap
+.type __gnat_sv_call_trap, %function
+__gnat_sv_call_trap:
+0: b 0b
+.size __gnat_sv_call_trap, . - __gnat_sv_call_trap
+
+.thumb_func
+.weak __gnat_pend_sv_trap
+.type __gnat_pend_sv_trap, %function
+__gnat_pend_sv_trap:
+0: b 0b
+.size __gnat_pend_sv_trap, . - __gnat_pend_sv_trap
+
+.thumb_func
+.weak __gnat_sys_tick_trap
+.type __gnat_sys_tick_trap, %function
+__gnat_sys_tick_trap:
+0: b 0b
+.size __gnat_sys_tick_trap, . - __gnat_sys_tick_trap
 
 
 
@@ -101,9 +128,6 @@ __vectors:
 decl_isr_bkpt isr_invalid
 decl_isr_bkpt isr_nmi
 decl_isr_bkpt isr_hardfault
-decl_isr_bkpt isr_svcall
-decl_isr_bkpt isr_pendsv
-decl_isr_bkpt isr_systick
 
 .macro decl_isr name
 .weak \name
@@ -155,47 +179,50 @@ __unhandled_user_irq:
 unhandled_user_irq_num_in_r0:
     bkpt #0
 
+
+
+.section .binary_info_header, "a"
+
+
+
+
+
+
+
+binary_info_header:
+.word 0x7188ebf2
+.word __binary_info_start
+.word __binary_info_end
+.word data_cpy_table
+.word 0xe71aa390
+
+
+
+
 .section .reset, "ax"
-
-
-
-
-
-
-    ldr r0, =__vectors
-    b __vector_entry
-
-
-
+# 182 "pico-sdk/src/rp2_common/pico_standard_link/crt0.S"
 .type _entry_point,%function
 .thumb_func
 .global _entry_point
 _entry_point:
-
-
-
-
-
-
-
+# 194 "pico-sdk/src/rp2_common/pico_standard_link/crt0.S"
     movs r0, #0
 
-
-__vector_entry:
-    ldr r1, =(0xe0000000 + 0x0000ed00)
-    str r0, [r1, #8]
+    ldr r1, =(0xe0000000 + 0x0000ed08)
+    str r0, [r1]
     ldmia r0!, {r1, r2}
     msr msp, r1
     bx r2
-# 188 "pico-sdk/src/rp2_common/pico_standard_link/crt0.S"
+# 209 "pico-sdk/src/rp2_common/pico_standard_link/crt0.S"
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
 
+
     ldr r0, =(0xd0000000 + 0x00000000)
     ldr r0, [r0]
     cmp r0, #0
-    //bne wait_for_vector
+    bne hold_non_core0_in_bootrom
 
     adr r4, data_cpy_table
 
@@ -226,7 +253,7 @@ platform_entry:
     blx r1
     ldr r1, =main
     blx r1
-    ldr r1, =_exit
+    ldr r1, =exit
     blx r1
 
 
@@ -245,15 +272,6 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
-
-
-binary_info_header:
-.word 0x7188ebf2
-.word __binary_info_start
-.word __binary_info_end
-.word data_cpy_table
-.word 0xe71aa390
-
 
 .align 2
 data_cpy_table:
@@ -291,12 +309,11 @@ runtime_init:
 
 
 
-/*
-wait_for_vector:
+
+hold_non_core0_in_bootrom:
     ldr r0, = 'W' | ('V' << 8)
     bl rom_func_lookup
     bx r0
-*/
 
 .global __get_current_exception
 .thumb_func

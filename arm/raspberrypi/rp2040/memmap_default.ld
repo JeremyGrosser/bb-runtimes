@@ -212,7 +212,9 @@ SECTIONS
     {
         __end__ = .;
         end = __end__;
+        __heap_start = .;
         *(.heap*)
+        __heap_end = .;
         __HeapLimit = .;
     } > RAM
 
@@ -244,6 +246,8 @@ SECTIONS
     __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
     __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
     __StackBottom = __StackTop - SIZEOF(.stack_dummy);
+    __stack_start = __StackTop;
+    __stack_end = __StackBottom;
     PROVIDE(__stack = __StackTop);
 
     /* Check if data + heap + stack exceeds RAM limit */

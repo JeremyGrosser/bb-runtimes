@@ -767,9 +767,11 @@ class RP2040(CortexM0P):
             'arm/raspberrypi/rp2040/svd/i-rp2040.ads',
             'arm/raspberrypi/rp2040/svd/i-rp2040-resets.ads',
             'arm/raspberrypi/rp2040/svd/handler.S',
-            'arm/raspberrypi/rp2040/boot2.S',
             'arm/raspberrypi/rp2040/crt0.S',
-            'arm/raspberrypi/rp2040/s-bbmcpa.ads')
+            'arm/raspberrypi/rp2040/s-bbmcpa.ads',
+            'arm/raspberrypi/rp2040/rom.ads',
+            'arm/raspberrypi/rp2040/rom.adb',
+            'arm/raspberrypi/rp2040/boot2.S')
 
         self.add_gnarl_sources(
             'arm/raspberrypi/rp2040/svd/a-intnam.ads',
