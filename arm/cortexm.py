@@ -1107,6 +1107,7 @@ class RP2040(CortexM0P):
             'arm/rpi/rp2040/svd/i-rp2040-sio.ads',
             'arm/rpi/rp2040/svd/i-rp2040-timer.ads',
             'arm/rpi/rp2040/svd/i-rp2040-watchdog.ads',
+            'arm/rpi/rp2040/svd/i-rp2040-xip_ssi.ads',
             'arm/rpi/rp2040/svd/i-rp2040-xosc.ads',
             'arm/rpi/rp2040/s-bbmcpa.ads.tmpl',
             'arm/rpi/rp2040/start-rom.S.tmpl',
@@ -1187,7 +1188,8 @@ class RpiPico(RP2040):
                                loader='RAM')
 
         self.add_gnat_sources(
-            'arm/rpi/rp2040/boot2__w25q080.S',)
+            'arm/rpi/rp2040/boot2.adb',
+            'arm/rpi/rp2040/boot2_generic_03.ads')
 
 
 class CortexM1(ArmV6MTarget):
